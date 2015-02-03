@@ -16,10 +16,12 @@ export default React.createClass({
           container.unregister('locale:' + lookupName);
       }
 
-      container.register('locale:' + lookupName, Ember.Object.extend({
+      container.register('locale:' + lookupName, {
           locale:   locale,
           messages: messages
-      }));
+      }, {
+          instantiate: false
+      });
     },
 
     componentWillReceiveProps: function (nextProps) {
