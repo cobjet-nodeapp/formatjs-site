@@ -167,7 +167,7 @@ App.ApplicationController = Ember.Controller.extend({
     </p>
 
     <p id="intl-get">
-        The <code>\{{intl-get}}</code> helper implements a lookup process by path to access data from the <code>intl</code> object passed into the Handlebars data channel when rendering the template. Usually this helper is used in a subexpression to lookup translated string messages; e.g., <code>(intl-get "messages.photos")</code>.
+        The <code>\{{intl-get}}</code> helper implements a lookup process by path to access data from the <code>intl</code> object passed into the Handlebars data channel when rendering the template. Usually this helper is used in a subexpression to lookup translated string messages; e.g., <code>(intl-get "photos")</code>.
     </p>
 
     <p>
@@ -203,21 +203,9 @@ App.ApplicationController = Ember.Controller.extend({
     </p>
 </section>
 
-{{#section-for 'footer'}}
+{{#section-for 'page-scripts'}}
     {{! renders into the footer section of view/layouts/main.hbs}}
     <script src="/vendor/jquery/jquery{{min}}.js"></script>
     <script src="/vendor/ember/ember{{min}}.js"></script>
     <script src="/vendor/ember-intl/ember-intl.js"></script>
-    <script type="text/javascript">
-        var Application = Ember.Application.extend();
-
-        window.App = Application.create({
-            ready: function () {
-                this.intl.setProperties({
-                    locales:        ['en-US'],
-                    defaultLocales: ['en-US']
-                });
-            }
-        });
-    </script>
 {{/section-for}}

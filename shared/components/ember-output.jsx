@@ -5,8 +5,21 @@ export default React.createClass({
 
     propTypes: {
         source  : React.PropTypes.string.isRequired,
-        context : React.PropTypes.object.isRequired,
-        onChange: React.PropTypes.func
+        context : React.PropTypes.object.isRequired
+    },
+
+    injectMessages: function (locale, messages) {
+      var container  = this.container;
+      var lookupName = locale.toLowerCase();
+
+      if (container.has('locale:' + lookupName)) {
+          container.unregister('locale:' + lookupName);
+      }
+
+      container.register('locale:' + lookupName, Ember.Object.extend({
+          locale:   locale,
+          messages: messages
+      }));
     },
 
     componentWillReceiveProps: function (nextProps) {
@@ -14,50 +27,44 @@ export default React.createClass({
             this.setState({});
         }
 
-        Object.keys(nextProps).forEach(function (key) {
-            if (key === 'locales') {
-                Ember.set(this.service, 'locales', nextProps[key]);
-            }
+        var locale = Ember.get(nextProps, 'locales');
 
-            this.controller.set(key, nextProps[key]);
-        }, this);
-    },
+        if (typeof locale === 'string') {
+            this.injectMessages(locale, nextProps.messages);
+            this.app.intl.set('locales', Ember.makeArray(locale));
+        }
 
-    localesChanged: function () {
-        this.props.onChange(this.service.get('locales'));
-    },
-
-    componentWillUnmount: function () {
-        this.service.off('localesChanged', this, this.localesChanged);
+        this.controller.setProperties(nextProps);
     },
 
     componentDidMount: function () {
-        window.Ember.Application.initializer({
+        var domElement = this.refs.placeholder.getDOMNode();
+        var locales    = Ember.makeArray(this.props.locales);
+
+        this.app = Ember.Application.extend().create({
+            rootElement: domElement,
+            ready: function () {
+                this.intl.setProperties({
+                    locales:        locales,
+                    defaultLocales: ['en-US']
+                });
+            }
+        });
+
+        this.app.initializer({
             name : this.props.exampleId,
             after: 'ember-intl-standalone',
 
             initialize: function (container, app) {
-                var domElement = this.refs.placeholder.getDOMNode();
-                var controller = this.controller = container.lookupFactory('controller:basic').create();
+                var controller = this.controller = container.lookupFactory('controller:basic').create(this.props.context);
+                this.container = container;
 
-                this.service = container.lookup('intl:main');
+                this.injectMessages(this.props.locales.toLowerCase(), this.props.messages);
 
-                if (!container.has('view:default')) {
-                    container.register('view:default', Ember.View);
-                }
-
-                this.service.on('localesChanged', this, this.localesChanged);
-
-                controller.setProperties(Object.assign({}, this.props.context, {
-                    locales  : this.props.locales,
-                    formats  : this.props.formats,
-                    messages : this.props.messages
-                }));
-
-                this.view = container.lookupFactory('view:default').create({
-                    template   : Ember.Handlebars.compile(this.props.source),
-                    controller : controller,
-                    context    : controller
+                this.view = Ember.View.create({
+                    template  : Ember.Handlebars.compile(this.props.source),
+                    context   : controller,
+                    container : container
                 });
 
                 this.view.appendTo(domElement);

@@ -18,7 +18,6 @@ module.exports = function (req, res, next) {
         // Provide the intl data on the response object.
         res.intl = {
             availableLocales: availableLocales,
-
             locales : [locale],
             messages: messages
         };

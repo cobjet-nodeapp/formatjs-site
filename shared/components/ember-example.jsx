@@ -70,7 +70,6 @@ export default React.createClass({
                     <h4 className="example-output-heading">Rendered</h4>
 
                     <EmberOutput
-                        onChange={this.updateLocale}
                         exampleId={example.id}
                         locales={currentLocale}
                         formats={example.meta.formats}

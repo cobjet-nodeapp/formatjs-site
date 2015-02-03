@@ -36,7 +36,7 @@
         "kbs": 7.1
     },
     "ember-intl/dist/ember-intl.min.js": {
-        "bytes": 0,
-        "kbs": 0
+        "bytes": 21362,
+        "kbs": 25
     }
 }
